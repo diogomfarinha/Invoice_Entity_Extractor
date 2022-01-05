@@ -7,14 +7,15 @@ invoice_path='invoices/invoice1.png'
 
 #Extract text from image
 ocr = OCR(invoice_path)
+
+#Get word compounds
 ocr.show_text(Text.COMPOUND)
-ocr_data=ocr.data
+comps=ocr.compounds
+comps
 
 #Find entities using compounds
 for entity in ENTITIES_TO_SEARCH:
-    matches=ocr_data['text'].str.match(entity.regex)
+    matches=comps[comps['text'].str.match(entity.regex, case=False)]
+    #Search right and bottom of matches
+    print(matches['text'],'\n\n')
 
-#matches=ocr['text'].apply(lambda x: bool(re.match(x, ENTITIES_TO_SEARCH[0].regex, re.IGNORECASE)))
-#match=ocr[matches]
-
-#line=ocr[(ocr['block_num']==5) & (ocr['par_num']==1) & (ocr['line_num']==1)]

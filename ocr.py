@@ -4,6 +4,7 @@ from random import randint
 
 #Third party imports
 import pytesseract
+import pandas as pd
 from PIL import Image, ImageDraw
 
 #Tesseract path LATER CHANGE TO A CONFIG FILE
@@ -25,7 +26,8 @@ class OCR:
     def __init__(self,image_path):
         self.image_path=image_path
         self.data = self.extract_data_from_image()
-        self.generate_word_compounds()
+        self.generate_word_compound_numbers()
+        self.compounds = self.create_compounds_table()
         
     
     #Use Tesseract to OCR the image
@@ -43,9 +45,8 @@ class OCR:
         
         return data
     
-    
-    #Generate compound numbers
-    def generate_word_compounds(self):
+    #Generate word compounds
+    def generate_word_compound_numbers(self):
         #Iterate through all blocks, paragraphs and lines to create word compounds
         self.data['compound_num']=0
         blocks=set(self.data['block_num'])
@@ -68,34 +69,46 @@ class OCR:
                                 compound_num+=1
                             self.data.at[filtered_word.index[0],'compound_num']=compound_num
                             right=filtered_word['right'].iloc[0]
-        
-        #Reorder columns
-        self.data = self.data[['block_num','par_num','line_num','compound_num','word_num','left','right','top','bottom','text']]
-
-
-    #Show text boxes
-    def show_text(self,text):
-        
+       
+    #Filter data dataframe
+    def filter_data(self,text_enum,return_text_column=False):
         #Get box filter
-        if text==Text.BLOCK:
+        if text_enum==Text.BLOCK:
             box_filter=['block_num']    
-        elif text==Text.PARAGRAPH:
+        elif text_enum==Text.PARAGRAPH:
             box_filter=['block_num','par_num']
-        elif text==Text.LINE:
+        elif text_enum==Text.LINE:
             box_filter=['block_num','par_num','line_num']   
-        elif text==Text.COMPOUND:
+        elif text_enum==Text.COMPOUND:
             box_filter=['block_num','par_num','line_num','compound_num']    
-        elif text==Text.WORD:
+        elif text_enum==Text.WORD:
             box_filter=['block_num','par_num','line_num','compound_num','word_num']
         else:
             raise ValueError('Text enum was not used. ')
-        
+         
         #Get boxes boundaries
-        left = self.data.groupby(box_filter)['left'].min()
-        right = self.data.groupby(box_filter)['right'].max()
-        top = self.data.groupby(box_filter)['top'].min()
-        bottom = self.data.groupby(box_filter)['bottom'].max()
-        boxes=[(left[i],right[i],top[i],bottom[i]) for i in left.index]
+        box_data = {}
+        box_data['left'] = list(self.data.groupby(box_filter)['left'].min())
+        box_data['right'] = list(self.data.groupby(box_filter)['right'].max())
+        box_data['top'] = list(self.data.groupby(box_filter)['top'].min())
+        box_data['bottom'] = list(self.data.groupby(box_filter)['bottom'].max())
+        
+        if return_text_column:
+            box_data['text'] = list(self.data.groupby(['block_num','par_num','line_num','compound_num']).agg({'text': ' '.join})['text'])
+        
+        return box_data  
+      
+    #Create compounds dataframe
+    def create_compounds_table(self):
+        box_data = self.filter_data(Text.COMPOUND,return_text_column=True)
+        return pd.DataFrame(box_data)
+        
+    
+    #Show text boxes
+    def show_text(self,text):
+        #Get boxes boundaries
+        box_data  = self.filter_data(text)
+        boxes=[(box_data['left'][i],box_data['right'][i],box_data['top'][i],box_data['bottom'][i]) for i in range(len(box_data['left']))]
 
         #Show boxes
         image = Image.open(self.image_path)
@@ -104,33 +117,4 @@ class OCR:
         for box in boxes:
             draw.rectangle([(box[0]-t, box[2]-t), (box[1]+t, box[3]+t)],outline=(randint(0,256),randint(0,256),randint(0,256)),width=t)
         image.show()
-                
-            
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
                 
