@@ -46,7 +46,7 @@ class OCR:
         return data
     
     #Generate word compounds
-    def generate_word_compound_numbers(self):
+    def generate_word_compound_numbers(self, pixel_limit=30):
         #Iterate through all blocks, paragraphs and lines to create word compounds
         self.data['compound_num']=0
         blocks=set(self.data['block_num'])
@@ -65,7 +65,7 @@ class OCR:
                         right=filtered_line[filtered_line['word_num']==word_nums[0]]['left'].iloc[0]
                         for num in word_nums:
                             filtered_word=filtered_line[filtered_line['word_num']==num]
-                            if filtered_word['left'].iloc[0]-right>30:
+                            if filtered_word['left'].iloc[0]-right>pixel_limit:
                                 compound_num+=1
                             self.data.at[filtered_word.index[0],'compound_num']=compound_num
                             right=filtered_word['right'].iloc[0]
