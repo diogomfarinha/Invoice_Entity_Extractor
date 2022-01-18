@@ -5,7 +5,7 @@ to extract text from images and simple regex matching to find the respective ent
 
 # Usage
 
-Go to src/ocr_test.py for example usage. 
+Go to tests/ocr_test.py for example usage. 
 The main features of this project are the following:
 
 + Create an OCR object with structured text extracted from an image:

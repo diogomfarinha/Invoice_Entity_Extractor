@@ -1,6 +1,6 @@
 #Local application imports
-from ocr import OCR, Text
-from entities import ENTITIES_TO_SEARCH
+from src.ocr import OCR, Text
+from src.entities import ENTITIES_TO_SEARCH
 
 #Invoice path
 invoice_path='invoices/invoice1.png'
