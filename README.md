@@ -10,7 +10,7 @@ The main features of this project are the following:
 
 + Create an OCR object with structured text extracted from an image:
 ```python
-from ocr import OCR
+from src.ocr import OCR
 
 invoice_path='invoices/invoice1.png'
 
@@ -19,6 +19,8 @@ ocr = OCR(invoice_path)
 
 + Visualize the text structure using predefined layers (e.g, blocks, lines, compounds) 
 ```python
+from src.ocr import Text
+
 ocr.show_text(Text.BLOCK)
 ```
 ![alt text](https://github.com/diogomfarinha/Invoice_Entity_Extractor/blob/master/images/blocks.JPG)
