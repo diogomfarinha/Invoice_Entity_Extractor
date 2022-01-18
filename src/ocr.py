@@ -1,14 +1,14 @@
 #Standard library imports
 from enum import Enum, unique
 from random import randint
+from PIL import Image, ImageDraw
 
 #Third party imports
 import pytesseract
 import pandas as pd
-from PIL import Image, ImageDraw
 
-#Tesseract path LATER CHANGE TO A CONFIG FILE
-pytesseract.pytesseract.tesseract_cmd = r'C:\Users\Diogo\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
+#Tesseract path
+pytesseract.pytesseract.tesseract_cmd = r'C:\Users\Diogo\AppData\Local\Programs\Tesseract-OCR\tesseract.exe' #TODO: Change to a config file
 
 
 @unique
@@ -23,7 +23,7 @@ class Text(Enum):
 
 class OCR:
     
-    def __init__(self,image_path):
+    def __init__(self,image_path): #TODO: Allow PDF path and convert it to images
         self.image_path=image_path
         self.data = self.extract_data_from_image()
         self.generate_word_compound_numbers()
@@ -45,7 +45,7 @@ class OCR:
         
         return data
     
-    #Generate word compounds
+    #Generate word compounds (small chunks of text)
     def generate_word_compound_numbers(self, pixel_limit=30):
         #Iterate through all blocks, paragraphs and lines to create word compounds
         self.data['compound_num']=0
@@ -106,7 +106,7 @@ class OCR:
     
     #Show text boxes
     def show_text(self,text):
-        #Get boxes boundaries
+        #Get box boundaries
         box_data  = self.filter_data(text)
         boxes=[(box_data['left'][i],box_data['right'][i],box_data['top'][i],box_data['bottom'][i]) for i in range(len(box_data['left']))]
 
@@ -118,3 +118,24 @@ class OCR:
             draw.rectangle([(box[0]-t, box[2]-t), (box[1]+t, box[3]+t)],outline=(randint(0,256),randint(0,256),randint(0,256)),width=t)
         image.show()
                 
+    #Search entities in word compounds
+    def search_entities(self,entities):
+        results = {}
+        for entity in entities:
+            #Find regex matches
+            matches = self.compounds[self.compounds['text'].str.match(entity.regex, case=False)]
+            if len(matches)>0:
+                matches = matches.iloc[0] #TODO: Search all the matches, not just the 1st one
+                
+                #Find value to the right of the regex match
+                pixels=15
+                nearby = self.compounds[(abs(self.compounds['top']-matches['top'])<pixels) & (abs(self.compounds['bottom']-matches['bottom'])<pixels) & (self.compounds['left']>matches['right'])]
+                if len(nearby)>0:
+                    value = nearby.iloc[0]['text']  
+                else: #TODO: Also search under the match and not just to the right
+                    value = 'NO VALUE FOUND'
+            else:
+                value = 'NO MATCH FOUND'
+            results[entity.name] = value
+        return results
+
