@@ -1,7 +1,7 @@
 # Project description
 
 Invoice_Entity_Extractor is an entity extractor for invoices. It uses Python-tesseract
-to extract text from images and simple regex matching to find the entities.
+to extract text from images and simple regex matching to find the respective entities.
 
 # Usage
 
@@ -23,12 +23,12 @@ ocr = OCR(invoice_path)
 ```python
 ocr.show_text(Text.BLOCK)
 ```
-![alt text](https://github.com/diogomfarinha/Invoice_Entity_Extractor/images/blocks.JPG)
+![alt text](https://github.com/diogomfarinha/Invoice_Entity_Extractor/blob/master/images/blocks.JPG)
 
 ```python
 ocr.show_text(Text.BLOCK)
 ```
-![alt text](https://github.com/diogomfarinha/Invoice_Entity_Extractor/images/compounds.JPG)
+![alt text](https://github.com/diogomfarinha/Invoice_Entity_Extractor/blob/master/images/compounds.JPG)
 
 + Create and customize entity list for extraction
 ```python
