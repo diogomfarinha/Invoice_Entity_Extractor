@@ -5,17 +5,15 @@ to extract text from images and simple regex matching to find the respective ent
 
 # Usage
 
-Go to ocr_test.py for example usage. 
+Go to src/ocr_test.py for example usage. 
 The main features of this project are the following:
 
 + Create an OCR object with structured text extracted from an image:
 ```python
 from ocr import OCR
 
-#Invoice path
 invoice_path='invoices/invoice1.png'
 
-#Extract text from image
 ocr = OCR(invoice_path)
 ```
 
@@ -26,13 +24,12 @@ ocr.show_text(Text.BLOCK)
 ![alt text](https://github.com/diogomfarinha/Invoice_Entity_Extractor/blob/master/images/blocks.JPG)
 
 ```python
-ocr.show_text(Text.BLOCK)
+ocr.show_text(Text.COMPOUND)
 ```
 ![alt text](https://github.com/diogomfarinha/Invoice_Entity_Extractor/blob/master/images/compounds.JPG)
 
-+ Create and customize entity list for extraction
-```python
-#Entities configuration        
++ Create and customize entities for extraction
+```python      
 PO={'name':'PO',
     'regex':r'po(#|number)?'}
 
@@ -47,9 +44,6 @@ DUE_DATE={'name':'Due Date',
 
 TOTAL={'name':'Total',
        'regex':r'total'}
-
-#Entities to search
-ENTITIES_TO_SEARCH=[Entity(**PO),Entity(**INVOICE_NO),Entity(**INVOICE_DATE),Entity(**DUE_DATE),Entity(**TOTAL)]
 ```
 
 + Extract entities from structured text
